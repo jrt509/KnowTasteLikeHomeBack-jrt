@@ -8,7 +8,7 @@ import io
 
 
 app= Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = ""
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://gljjbzqeiahwsb:981a6ed49fdd12c9f7439d9eac42d51f5b775b733c4a8f5b4e088e1e9ec11003@ec2-54-161-208-31.compute-1.amazonaws.com:5432/d3dpgcv5rhnalh"
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
