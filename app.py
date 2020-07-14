@@ -4,7 +4,7 @@ from flask_marshmallow import Marshmallow
 from flask_cors import CORS 
 from flask_heroku import Heroku
 from flask_bcrypt import Bcrypt
-import io 
+
 
 
 app= Flask(__name__)
@@ -24,6 +24,7 @@ class User(db.Model):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(), nullable=False)
     
+    
 
     def __init__(self, firstname, lastname, username, password):
         self.firstname = firstname
@@ -37,6 +38,26 @@ class UserSchema(ma.Schema):
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
+class Recipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(), nullable=False)
+    ingredients = db.Column(db.String(), nullable=False)
+    preperation = db.Column(db.String(), nullable=False)
+    
+    
+    def __init__(self, title, ingredients, preperation):
+        self.title = title
+        self.ingredients = ingredients
+        self.preperation = preperation
+        
+        
+class RecipeSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "title", "ingredients", "preperation")    
+
+recipe_schema = RecipeSchema()
+recipes_schema = RecipeSchema(many=True)
 
 @app.route("/user/add", methods=["POST"])
 def add_user():
@@ -60,6 +81,44 @@ def add_user():
     db.session.commit()
 
     return jsonify("User Created Successfully")
+
+@app.route("/user/get", methods=["GET"])
+def get_users():
+    users = db.session.query(User).all()
+    return jsonify(users_schema.dump(users))
+
+@app.route("/recipe/add", methods=["POST"])
+def add_recipe():
+    if request.content_type != "application/json":
+        return jsonify("Error: Data must be sent as JSON")
+
+    post_data = request.get_json()
+    title = post_data.get("title")
+    ingredients = post_data.get("ingredients")
+    preperation = post_data.get("preperation")
+
+    
+
+    new_recipe = Recipe(title, ingredients, preperation)
+    db.session.add(new_recipe)
+    db.session.commit()
+
+    return jsonify("Recipe added successfully")
+
+
+@app.route("/recipe/get", methods=["GET"])
+def get_recipes():
+    recipes = db.session.query(Recipe).all()
+    return jsonify(recipes_schema.dump(recipes))
+
+
+
+    
+
+
+
+
+    
 
 
 
