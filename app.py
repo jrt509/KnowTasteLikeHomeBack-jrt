@@ -87,6 +87,24 @@ def get_users():
     users = db.session.query(User).all()
     return jsonify(users_schema.dump(users))
 
+@app.route("/user/verified", methods=["POST"])
+def verify_user():
+    print(request.content_type)
+    if request.content_type != "application/json":
+        return jsonify("Error: Data must be sent as JSON")
+
+    post_data = request.get_json()
+    username = post_data.get("username")
+    password = post_data.get("password")
+
+    stored_password = db.session.query(User.password).filter(User.username == username).all()
+    
+
+    if stored_password is None:
+        return jsonify("User NOT Verified")
+
+    return jsonify("User Verified")
+
 @app.route("/recipe/add", methods=["POST"])
 def add_recipe():
     if request.content_type != "application/json":
