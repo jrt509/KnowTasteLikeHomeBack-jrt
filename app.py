@@ -8,7 +8,7 @@ from flask_bcrypt import Bcrypt
 
 
 app= Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://gljjbzqeiahwsb:981a6ed49fdd12c9f7439d9eac42d51f5b775b733c4a8f5b4e088e1e9ec11003@ec2-54-161-208-31.compute-1.amazonaws.com:5432/d3dpgcv5rhnalh"
+app.config["SQLALCHEMY_DATABASE_URI"] = ""
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -127,6 +127,12 @@ def add_recipe():
 @app.route("/recipe/get", methods=["GET"])
 def get_recipes():
     recipes = db.session.query(Recipe).all()
+    return jsonify(recipes_schema.dump(recipes))
+
+@app.route("/recipe/get/<username>", methods=["GET"])
+def get_recipes_by_username(username):
+    user = db.session.query(User).filter(User.username == username).first()
+    recipes = db.session.query(Recipe).filter(Recipe.user == user).all()
     return jsonify(recipes_schema.dump(recipes))
 
 
