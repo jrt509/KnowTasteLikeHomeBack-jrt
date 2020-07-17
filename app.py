@@ -8,7 +8,7 @@ from flask_bcrypt import Bcrypt
 
 
 app= Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://hchgnlflvayxgp:99524eaa7e709ef8aac17d35157544d91b182ba5d851b427be5cbe3af24b9ab9@ec2-50-17-90-177.compute-1.amazonaws.com:5432/d4ps8s8v21pi0k"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://omspecbugilads:bb43dccd6c3b093851f6a0c2ce14466461c67118f6b80941b5e563c2ab056599@ec2-52-23-14-156.compute-1.amazonaws.com:5432/d65ecc8id9jgd7"
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -45,7 +45,7 @@ class Recipe(db.Model):
     title = db.Column(db.String(), nullable=False)
     ingredients = db.Column(db.String(), nullable=False)
     preperation = db.Column(db.String(), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id", nullable=False))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     
     
     def __init__(self, title, ingredients, preperation, user_id):
@@ -124,7 +124,7 @@ def add_recipe():
     preperation = post_data.get("preperation")
     username = post_data.get("username")
 
-    user_id = db.session.query(User.id).filter(User.username == username.)first()
+    user_id = db.session.query(User.id).filter(User.username == username).first()
     
 
     new_recipe = Recipe(title, ingredients, preperation, user_id[0])
@@ -141,24 +141,17 @@ def get_recipes():
 
 @app.route("/recipe/get/<username>", methods=["GET"])
 def get_recipes_by_username(username):
-    user_id = db.session.query(User).filter(User.username == username).first()[0]
+    user_id = db.session.query(User.id).filter(User.username == username).first()[0]
     recipes = db.session.query(Recipe).filter(Recipe.user_id == user_id).all()
     return jsonify(recipes_schema.dump(recipes))
 
-
-
+@app.route("/recipe/delete/<username>", methods=["Delete"])
+def delete_recipe(id):
+    recipe = db.session.query(Recipe).filter(Recipe.id == id).first()
+    db.session.delete(recipe)
+    db.session.commit()
+    return jsonify("Recipe deleted successfully")
     
-
-
-
-
-    
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
